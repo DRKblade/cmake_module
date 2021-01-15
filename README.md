@@ -1,20 +1,20 @@
 Example configuration for file_list.cmake
 ```
 # paths to various directories
-get_filename_component(generated_headers_dir ${CMAKE_BINARY_DIR}/generated-headers ABSOLUTE)
-get_filename_component(include_dir ${CMAKE_SOURCE_DIR}/include ABSOLUTE)
-get_filename_component(private_headers_dir ${CMAKE_SOURCE_DIR}/private-headers ABSOLUTE)
-get_filename_component(src_dir ${CMAKE_SOURCE_DIR}/src ABSOLUTE)
-get_filename_component(test_dir ${CMAKE_SOURCE_DIR}/test ABSOLUTE)
-set(header_dirs ${include_dir} ${private_headers_dir} ${generated_headers_dir})
+get_filename_component(GENERATED_HEADERS_DIR ${CMAKE_BINARY_DIR}/generated-headers ABSOLUTE)
+get_filename_component(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include ABSOLUTE)
+get_filename_component(PRIVATE_HEADERS_DIR ${CMAKE_SOURCE_DIR}/private-headers ABSOLUTE)
+get_filename_component(SRC_DIR ${CMAKE_SOURCE_DIR}/src ABSOLUTE)
+get_filename_component(TEST_DIR ${CMAKE_SOURCE_DIR}/test ABSOLUTE)
+set(HEADER_DIRS ${INCLUDE_DIR} ${PRIVATE_HEADERS_DIR} ${GENERATED_HEADERS_DIR})
 
 # configure files {{{
   if(PLATFORM EQUAL "Linux")
     add_compile_definitions(PLATFORM_LINUX)
   endif()
 
-  configure_file(${private_headers_dir}/common.hpp.in 
-    ${generated_headers_dir}/common.hpp
+  configure_file(${PRIVATE_HEADERS_DIR}/common.hpp.in 
+    ${GENERATED_HEADERS_DIR}/common.hpp
     ESCAPE_QUOTES)
 
   unset(DEBUG_SCOPES CACHE)
@@ -22,12 +22,12 @@ set(header_dirs ${include_dir} ${private_headers_dir} ${generated_headers_dir})
 
 # public headers
 set(HEADERS
-  ${include_dir}/???.hpp
+  ${INCLUDE_DIR}/???.hpp
 )
 
 # source files
 set(SOURCES
-  ${src_dir}/???.cpp
+  ${SRC_DIR}/???.cpp
 )
 
 if(BUILD_TESTS)

@@ -23,35 +23,43 @@
 # }}}
 
 add_custom_target(${PROJECT_NAME}_tests COMMENT "Building all unit test")
-add_library(lib${PROJECT_NAME} SHARED IMPORTED)
-set_property(TARGET lib${PROJECT_NAME} PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/lib${PROJECT_NAME}.so)
 
-# Utility functions to add unit tests {{{
-  function(setup_unit_test source_file output_name)
-    string(REPLACE "/" "_" testname ${source_file})
-    set(name "test.${testname}")
-    set(${output_name} ${name} PARENT_SCOPE)
-    add_executable(${name} ${test_dir}/${source_file}.cpp)
-    add_test(NAME ${name} COMMAND ${name})
-    add_dependencies(${PROJECT_NAME}_tests ${name})
-    set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
-  endfunction()
+## Utility functions to add unit tests
+function(setup_unit_test root_dir source_file output_name)
+  string(REPLACE "/" "_" testname ${source_file})
+  set(name "test.${testname}")
+  set(${output_name} ${name} PARENT_SCOPE)
+  add_executable(${name} ${root_dir}/${source_file}.cpp)
+  add_test(NAME ${name} COMMAND ${name})
+  add_dependencies(${PROJECT_NAME}_tests ${name})
+  set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
+endfunction()
 
-  # Add internal unit tests. Public and private headers are visible to them
-  function(add_unit_test source_file)
-    setup_unit_test(${source_file} name)
-    # Link against gmock (this automatically links against gtest)
-    target_link_libraries(${name} ${PROJECT_NAME} gmock_main)
-  endfunction()
+# Add internal unit tests. Public and private headers are visible to them
+function(add_internal_test root_dir source_file)
+  setup_unit_test(${root_dir} ${source_file} name)
+  # Link against gmock (this automatically links against gtest)
+  target_link_libraries(${name} ${PROJECT_NAME} gmock_main)
+endfunction()
 
-  # Add external unit tests. Only the public headers are visible to them
-  function(add_lib_test source_file)
-    setup_unit_test(${source_file} name)
-    target_link_libraries(${name} lib${PROJECT_NAME} gmock_main)
-    target_include_directories(${name} PUBLIC ${PROJECT_SOURCE_DIR}/include ${private_headers_dir})
-  endfunction()
-# }}}
+# Add external unit tests. Only the public headers are visible to them
+function(add_external_test root_dir source_file)
+  setup_unit_test(${root_dir} ${source_file} name)
+  target_link_libraries(${name} ${PROJECT_NAME}_physical gmock_main)
+endfunction()
 
-# Run make check to build and run all unit tests
-add_custom_target(check COMMAND GTEST_COLOR=1 ctest --output-on-failure
-                        DEPENDS ${PROJECT_NAME}_tests)
+function(add_unit_tests test_root internal_tests external_tests)
+  message(${internal_tests})
+  message(${external_tests})
+  foreach(test ${internal_tests})
+    add_internal_test(${test_root} ${test})
+    message(${test})
+  endforeach()
+  foreach(test ${external_tests})
+    add_external_test(${test_root} ${test})
+    message(${test})
+  endforeach()
+
+  add_custom_target(check COMMAND GTEST_COLOR=1 ctest --output-on-failure
+                          DEPENDS ${PROJECT_NAME}_tests)
+endfunction()
