@@ -1,6 +1,8 @@
-# Download and unpack googletest at configure time {{{
-  configure_file(${CMAKE_CURRENT_LIST_DIR}/googletest.in
-                 ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/googletest.in
+               ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
+
+# Download and unpack googletest at configure time
+function(setup_googletest)
   execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
                   RESULT_VARIABLE result
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download)
@@ -20,7 +22,7 @@
   add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
                    ${CMAKE_BINARY_DIR}/googletest-build
                    EXCLUDE_FROM_ALL)
-# }}}
+endfunction()
 
 add_custom_target(${PROJECT_NAME}_tests COMMENT "Building all unit test")
 
@@ -49,15 +51,13 @@ function(add_external_test root_dir source_file)
 endfunction()
 
 function(add_unit_tests test_root internal_tests external_tests)
-  message(${internal_tests})
-  message(${external_tests})
+  setup_googletest()
+
   foreach(test ${internal_tests})
     add_internal_test(${test_root} ${test})
-    message(${test})
   endforeach()
   foreach(test ${external_tests})
     add_external_test(${test_root} ${test})
-    message(${test})
   endforeach()
 
   add_custom_target(check COMMAND GTEST_COLOR=1 ctest --output-on-failure
