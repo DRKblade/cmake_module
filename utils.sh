@@ -10,7 +10,18 @@ declare -rA COLORS=(
   [BOLD]=$'\033[1m' 
   [OFF]=$'\033[0m' 
 )
- 
+
+archive() {
+  path=./build/$PROJECT-$VERSION
+  git archive --prefix $PROJECT/ --output $path.tar --format tar HEAD &&
+  git archive --prefix $PROJECT/ --output $path.tar.gz --format tar.gz HEAD &&
+  echo "Archive generated to $path"
+}
+
+built_line_count() {
+  wc -l $(find {src,include,private-headers} -path "*.*")
+}
+
 usage() { 
   echo " 
   Builds and installs $PROJECT.
@@ -21,6 +32,10 @@ usage() {
   ${COLORS[GREEN]}${COLORS[BOLD]}Options:${COLORS[OFF]}
       ${COLORS[GREEN]}-A, --auto${COLORS[OFF]}
           Use defaults for every options
+      ${COLORS[GREEN]}-a, --archive${COLORS[OFF]}
+          Copy local git repo to archive files
+      ${COLORS[GREEN]}--built-line-count${COLORS[OFF]}
+          Print line count for header and source code files (not including cmake and tests)
       ${COLORS[GREEN]}-I, --noinstall${COLORS[OFF]}
           Execute 'sudo make install' and install $PROJECT
       ${COLORS[GREEN]}-t, --tests${COLORS[OFF]}
@@ -51,6 +66,12 @@ branch_switches() {
       [[ -z "$INSTALL" ]] && INSTALL=ON;
       [[ -z "$BUILD_TESTS" ]] && BUILD_TESTS=OFF;
       ;;
+    -a|--archive)
+      archive; ;;
+    --built-line-count)
+      built_line_count;
+      exit 0
+      ;;
     -s|--scopes)
       DEBUG_SCOPES=$2
       ;;
@@ -80,14 +101,14 @@ branch_switches() {
   esac
 }
 
-parse() {
+parse_options() {
   while [[ "$1" == -* ]]; do
     branch_switches $@
     shift
   done
 }
 
-ask() {
+ask_options() {
   if [[ -z "$BUILD_TESTS" ]]; then
     read -r -p "$(msg "Build and run unit tests? [y/N]: ")" -n 1 p && echo
     [[ "${p^^}" != "Y" ]] && BUILD_TESTS="OFF" || BUILD_TESTS="ON"
@@ -109,12 +130,7 @@ install() {
   fi
 }
 
-main() {
-  [[ -d ./.git ]] && { 
-    msg "Fetching submodules" 
-    git submodule update --init --recursive || msg_err "Failed to clone submodules"
-  } 
-
+build() {
   [[ -d ./build ]] && {
     if [[ "$PURGE_BUILD_DIR" == ON ]]; then
       msg "Removing existing build dir"
