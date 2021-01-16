@@ -22,19 +22,15 @@ set(HEADER_DIRS ${INCLUDE_DIR} ${PRIVATE_HEADERS_DIR} ${GENERATED_HEADERS_DIR})
 
 # public headers
 set(HEADERS
-  ${INCLUDE_DIR}/???.hpp
+  ${INCLUDE_DIR}/_header_.hpp
 )
 
 # source files
 set(SOURCES
-  ${SRC_DIR}/???.cpp
+  ${SRC_DIR}/_src_.cpp
 )
 
-if(BUILD_TESTS)
-  enable_testing()
-  include(cmake/test)
-
-  add_unit_test(???)
-  add_lib_test(???)
-endif()
+set(INTERNAL_TESTS _test1_)
+set(EXTERNAL_TESTS _test2_)
+set(TEST_FILES _test_file_)
 ```

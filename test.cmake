@@ -50,7 +50,7 @@ function(add_external_test root_dir source_file)
   target_link_libraries(${name} ${PROJECT_NAME}_physical gmock_main)
 endfunction()
 
-function(add_unit_tests test_root internal_tests external_tests)
+function(add_unit_tests test_root internal_tests external_tests copied_files)
   setup_googletest()
 
   foreach(test ${internal_tests})
@@ -58,6 +58,9 @@ function(add_unit_tests test_root internal_tests external_tests)
   endforeach()
   foreach(test ${external_tests})
     add_external_test(${test_root} ${test})
+  endforeach()
+  foreach(file ${copied_files})
+    configure_file(${test_root}/${file} ${CMAKE_BINARY_DIR}/test/${file} COPYONLY)
   endforeach()
 
   add_custom_target(check COMMAND GTEST_COLOR=1 ctest --output-on-failure
