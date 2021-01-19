@@ -3,7 +3,6 @@ function(auto_targets project_name include_dirs header_dir source_files header_f
   add_library(${project_name} SHARED ${source_files})
   list(APPEND targets ${project_name})
   target_include_directories(${project_name} PUBLIC ${include_dirs})
-  
 
   set_target_properties(${project_name} PROPERTIES PUBLIC_HEADER "${header_files}")
   install(TARGETS ${project_name}
@@ -13,6 +12,7 @@ function(auto_targets project_name include_dirs header_dir source_files header_f
   ## Add the build result of the shared library to be used by the executable and external tests
   add_library(${project_name}_physical SHARED IMPORTED)
   target_include_directories(${project_name}_physical INTERFACE ${header_dir})
+  add_dependencies(${project_name}_physical ${project_name})
   set_property(TARGET ${project_name}_physical PROPERTY
                IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/lib${project_name}.so)
 
@@ -20,7 +20,6 @@ function(auto_targets project_name include_dirs header_dir source_files header_f
   if(NOT executable_files STREQUAL "")
     add_executable(${project_name}_exec ${executable_files})
     list(APPEND targets ${project_name}_exec)
-    add_dependencies(${project_name}_exec ${project_name})
     target_link_libraries(${project_name}_exec ${project_name}_physical)
     target_include_directories(${project_name}_exec PUBLIC ${include_dirs})
 

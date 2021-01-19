@@ -65,4 +65,21 @@ function(add_unit_tests test_root internal_tests external_tests copied_files)
 
   add_custom_target(check COMMAND GTEST_COLOR=1 ctest --output-on-failure
                           DEPENDS ${PROJECT_NAME}_tests)
+
+  if(GEN_COVERAGE)
+    target_compile_options(${PROJECT_NAME} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
+    target_link_options(${PROJECT_NAME} PRIVATE -lgcov --coverage)
+
+    add_custom_target(cov_init
+        COMMAND mkdir -p coverage/lcov coverage/report
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+
+    add_custom_target(lcov
+        COMMAND echo "=================== LCOV ===================="
+        COMMAND echo "-- Passing lcov tool under code coverage"
+        COMMAND lcov --capture --directory CMakeFiles/strings.dir/ --output-file coverage/lcov/main_coverage.info
+        COMMAND echo "-- Generating HTML output files"
+        COMMAND genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  endif()
 endfunction()

@@ -36,6 +36,8 @@ usage() {
           Copy local git repo to archive files
       ${COLORS[GREEN]}--built-line-count${COLORS[OFF]}
           Print line count for header and source code files (not including cmake and tests)
+      ${COLORS[GREEN]}-T, --coverage${COLORS[OFF]}
+          Generate code coverage for the project (implies -t)
       ${COLORS[GREEN]}-I, --noinstall${COLORS[OFF]}
           Execute 'sudo make install' and install $PROJECT
       ${COLORS[GREEN]}-t, --tests${COLORS[OFF]}
@@ -79,6 +81,9 @@ branch_switches() {
       INSTALL=OFF; ;;
     -t|--test)
       BUILD_TESTS=ON; ;;
+    -T|--coverage)
+      BUILD_TESTS=ON;
+      GEN_COVERAGE=ON; ;;
     -P|--purge)
       PURGE_BUILD_DIR=ON; ;;
     -p|--use-PREFIX)
@@ -153,6 +158,7 @@ build() {
   msg "Executing CMake command"
   cmake -DBUILD_TESTS=${BUILD_TESTS} \
         -DDEBUG_SCOPES=${DEBUG_SCOPES} \
+        -DGEN_COVERAGE=${GEN_COVERAGE} \
         -DPLATFORM="Linux" \
         ${USE_PREFIX_OPTION} \
         .. || msg_err "Failed to compile project..."
@@ -161,13 +167,18 @@ build() {
   make || msg_err "Failed to build project"
 
   # Call tests from inside the test directory so that file dependencies work
-  cd test
   if [[ "$BUILD_TESTS" == ON ]]; then
+    cd test || msg_err "Can't enter test directory"
     for file in ./test.*; do
       eval "$file" || msg_err "Unit test failed"
     done
+    cd ..
+    [[ "$GEN_COVERAGE" == ON ]] && {
+      msg "Generating code coverage report"
+      make cov_init &&
+      make lcov
+    }
   fi
-  cd ..
 
   install
 
