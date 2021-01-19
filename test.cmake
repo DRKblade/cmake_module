@@ -53,7 +53,7 @@ function(add_unit_tests test_root internal_tests external_tests copied_files)
     add_custom_target(lcov
         COMMAND echo "=================== LCOV ===================="
         COMMAND echo "-- Passing lcov tool under code coverage"
-        COMMAND lcov -c -d CMakeFiles/strings.dir/ -o coverage/lcov/main_coverage.info --include "${CMAKE_SOURCE_DIR}/\\*"
+        COMMAND lcov -c -d CMakeFiles/ -o coverage/lcov/main_coverage.info --include "${CMAKE_SOURCE_DIR}/\\*"
         COMMAND echo "-- Generating HTML output files"
         COMMAND genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
