@@ -1,31 +1,3 @@
-configure_file(${CMAKE_CURRENT_LIST_DIR}/googletest.in
-               ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
-
-# Download and unpack googletest at configure time
-function(setup_googletest)
-  execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-                  RESULT_VARIABLE result
-                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download)
-  if(result)
-    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
-  endif()
-
-  execute_process(COMMAND ${CMAKE_COMMAND} --build .
-                  RESULT_VARIABLE result
-                  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download)
-  if(result)
-    message(FATAL_ERROR "Build step for googletest failed: ${result}")
-  endif()
-
-  # Add googletest directly to our build. This defines
-  # the gtest, gtest_main, gmock and gmock_main targets.
-  add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-                   ${CMAKE_BINARY_DIR}/googletest-build
-                   EXCLUDE_FROM_ALL)
-endfunction()
-
-add_custom_target(${PROJECT_NAME}_tests COMMENT "Building all unit test")
-
 ## Utility functions to add unit tests
 function(setup_unit_test root_dir source_file output_name)
   string(REPLACE "/" "_" testname ${source_file})
@@ -51,7 +23,11 @@ function(add_external_test root_dir source_file)
 endfunction()
 
 function(add_unit_tests test_root internal_tests external_tests copied_files)
-  setup_googletest()
+  add_custom_target(${PROJECT_NAME}_tests COMMENT "Building all unit test")
+  
+  # Update googletest submodule
+  execute_process(COMMAND git submodule update --init --recursive -- ${CMAKE_SOURCE_DIR}/lib/googletest)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/lib/googletest EXCLUDE_FROM_ALL)
 
   foreach(test ${internal_tests})
     add_internal_test(${test_root} ${test})
