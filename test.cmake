@@ -24,9 +24,9 @@ endfunction()
 
 function(add_unit_tests test_root internal_tests external_tests copied_files)
   add_custom_target(${PROJECT_NAME}_tests COMMENT "Building all unit test")
-  
+
   # Update googletest submodule
-  execute_process(COMMAND git submodule update --init --recursive -- ${CMAKE_SOURCE_DIR}/lib/googletest)
+  execute_process(COMMAND git submodule update --init -- ${CMAKE_SOURCE_DIR}/lib/googletest)
   add_subdirectory(${CMAKE_SOURCE_DIR}/lib/googletest EXCLUDE_FROM_ALL)
 
   foreach(test ${internal_tests})
@@ -53,7 +53,7 @@ function(add_unit_tests test_root internal_tests external_tests copied_files)
     add_custom_target(lcov
         COMMAND echo "=================== LCOV ===================="
         COMMAND echo "-- Passing lcov tool under code coverage"
-        COMMAND lcov --capture --directory CMakeFiles/strings.dir/ --output-file coverage/lcov/main_coverage.info
+        COMMAND lcov -c -d CMakeFiles/strings.dir/ -o coverage/lcov/main_coverage.info --include "${CMAKE_SOURCE_DIR}/\\*"
         COMMAND echo "-- Generating HTML output files"
         COMMAND genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
