@@ -38,6 +38,7 @@
   if(result)
     message(FATAL_ERROR "Googletest submodule not found at ${LIBRARY_DIR}/googletest")
   endif()
+  set(INSTALL_GTEST OFF)
   add_subdirectory(${CMAKE_SOURCE_DIR}/lib/googletest EXCLUDE_FROM_ALL)
 
   # Add unit tests and copied files
