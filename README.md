@@ -23,7 +23,7 @@ list(APPEND INCLUDE_DIRS ${PUBLIC_HEADERS_DIR} ${PRIVATE_HEADERS_DIR} ${GENERATE
 
 # public headers
 set(PUBLIC_HEADERS
-  ${PUBLIC_HEADER_DIR}/_header_.hpp
+  ${PUBLIC_HEADERS_DIR}/_header_.hpp
 )
 
 # source files
