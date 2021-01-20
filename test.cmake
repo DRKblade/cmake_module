@@ -63,7 +63,7 @@ if(GEN_COVERAGE)
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
   add_custom_target(lcov
-    COMMAND lcov -c -d CMakeFiles/ -o coverage/lcov/main_coverage.info --include "${CMAKE_SOURCE_DIR}/\\*" &&
+    COMMAND lcov -c -d CMakeFiles/ -o coverage/lcov/main_coverage.info --include "${SRC_DIR}/\\*" &&
             genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
