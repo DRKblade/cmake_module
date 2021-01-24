@@ -42,13 +42,15 @@ usage() {
           Execute 'sudo make install' and install $PROJECT
       ${COLORS[GREEN]}-t, --tests${COLORS[OFF]}
           Build unit tests into './build/test'
+      ${COLORS[GREEN]}-l, --log <log-level>${COLORS[OFF]}
+          Build unit tests into './build/test'
       ${COLORS[GREEN]}-P, --purge${COLORS[OFF]}
           Delete './build' directory before building
-      ${COLORS[GREEN]}-s, --scopes${COLORS[OFF]}
+      ${COLORS[GREEN]}-s, --scopes <scopes>${COLORS[OFF]}
           Add scopes for debug logging
       ${COLORS[GREEN]}-p, --use-PREFIX${COLORS[OFF]}
           Set cmake variable CMAKE_INSTALL_PREFIX to \$PREFIX
-      ${COLORS[GREEN]}-c, --cmake-option${COLORS[OFF]}
+      ${COLORS[GREEN]}-c, --cmake-option <options>${COLORS[OFF]}
           Add other cmake options
       ${COLORS[GREEN]}-h, --help${COLORS[OFF]}
           Show this help message
@@ -82,6 +84,8 @@ branch_switches() {
       INSTALL=OFF; ;;
     -t|--test)
       BUILD_TESTS=ON; ;;
+    -l|--log)
+      LOG_LEVEL=$2; ;;
     -T|--coverage)
       BUILD_TESTS=ON;
       GEN_COVERAGE=ON; ;;
@@ -157,11 +161,13 @@ build() {
   fi
 
   [[ -z "$DEBUG_SCOPES" ]] || msg "Using debug scopes: $DEBUG_SCOPES"
+  [[ -z "$LOG_LEVEL" ]] && LOG_LEVEL=0
 
   msg "Executing CMake command"
   cmake -DBUILD_TESTS=${BUILD_TESTS} \
         -DDEBUG_SCOPES=${DEBUG_SCOPES} \
         -DGEN_COVERAGE=${GEN_COVERAGE} \
+        -DLOG_LEVEL=${LOG_LEVEL} \
         -DPLATFORM="Linux" \
         ${USE_PREFIX_OPTION} \
         -${CMAKE_OPTIONS} \
