@@ -48,6 +48,8 @@ usage() {
           Add scopes for debug logging
       ${COLORS[GREEN]}-p, --use-PREFIX${COLORS[OFF]}
           Set cmake variable CMAKE_INSTALL_PREFIX to \$PREFIX
+      ${COLORS[GREEN]}-c, --cmake-option${COLORS[OFF]}
+          Add other cmake options
       ${COLORS[GREEN]}-h, --help${COLORS[OFF]}
           Show this help message
 "
@@ -75,8 +77,7 @@ branch_switches() {
       exit 0
       ;;
     -s|--scopes)
-      DEBUG_SCOPES=$2
-      ;;
+      DEBUG_SCOPES=$2; ;;
     -I|--noinstall)
       INSTALL=OFF; ;;
     -t|--test)
@@ -88,6 +89,8 @@ branch_switches() {
       PURGE_BUILD_DIR=ON; ;;
     -p|--use-PREFIX)
       USE_PREFIX=ON; ;;
+    -c|--cmake-options)
+      CMAKE_OPTIONS=$2; ;;
     -h|--help)
       usage
       exit 0
@@ -161,6 +164,7 @@ build() {
         -DGEN_COVERAGE=${GEN_COVERAGE} \
         -DPLATFORM="Linux" \
         ${USE_PREFIX_OPTION} \
+        -${CMAKE_OPTIONS} \
         .. || msg_err "Failed to compile project..."
 
   msg "Building project"

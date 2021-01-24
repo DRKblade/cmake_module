@@ -34,3 +34,22 @@ set_target_properties(${targets}
   PROPERTIES VERSION ${PROJECT_VERSION}
              RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+message("log level ${LOG_LEVEL}")
+if(LOG_LEVEL GREATER -2)
+  set(LG_ERR ON)
+  if(LOG_LEVEL GREATER -1)
+    set(LG_WARN true)
+    if(LOG_LEVEL GREATER 0)
+      set(LG_INFO true)
+      if (LOG_LEVEL GREATER 1)
+        set(LG_DBUG true)
+message("reached ${LOG_LEVEL} ${LG_DBUG}")
+      endif()
+    endif()
+  endif()
+endif()
+
+if(PLATFORM STREQUAL "Linux")
+  set(PLATFORM_LINUX ON)
+endif()
