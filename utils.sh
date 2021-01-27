@@ -35,7 +35,7 @@ usage() {
       ${COLORS[GREEN]}-a, --archive${COLORS[OFF]}
           Copy local git repo to archive files
       ${COLORS[GREEN]}--built-line-count${COLORS[OFF]}
-          Print line count for header and source code files (not including cmake and tests)
+          Print line count for header and source code files
       ${COLORS[GREEN]}-T, --coverage${COLORS[OFF]}
           Generate code coverage for the project (implies -t)
       ${COLORS[GREEN]}-I, --noinstall${COLORS[OFF]}
