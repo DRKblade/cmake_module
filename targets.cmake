@@ -10,16 +10,17 @@
 # }}}
 
 # Add the build result of the shared library to be used by the executable and external tests {{{
+  foreach(header ${PUBLIC_HEADERS})
+    get_filename_component(header_name ${header} NAME)
+    configure_file(${header} ${CMAKE_BINARY_DIR}/public-headers/${header_name} COPYONLY)
+  endforeach()
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/public-headers)
   add_library(${PROJECT_NAME}_physical SHARED IMPORTED)
   target_include_directories(${PROJECT_NAME}_physical INTERFACE ${CMAKE_BINARY_DIR}/public-headers)
   add_dependencies(${PROJECT_NAME}_physical ${PROJECT_NAME})
   set_property(TARGET ${PROJECT_NAME}_physical PROPERTY
                IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/lib${PROJECT_NAME}.so)
   # Copy the public header files to a different directory to be included to the physical library
-  foreach(header ${PUBLIC_HEADERS})
-    get_filename_component(header_name ${header} NAME)
-    configure_file(${header} ${CMAKE_BINARY_DIR}/public-headers/${header_name} COPYONLY)
-  endforeach()
 # }}}
 
 ## Add executable to provide a command-line interface
