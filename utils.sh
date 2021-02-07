@@ -10,6 +10,8 @@ declare -rA COLORS=(
   [BOLD]=$'\033[1m' 
   [OFF]=$'\033[0m' 
 )
+PROJECT=$(grep -oP 'project\(\K[\w]+' CMakeLists.txt)
+VERSION=$(grep -oP 'project\(.*? VERSION \K[0-9.]+' CMakeLists.txt)
 
 archive() {
   path=./build/$PROJECT-$VERSION
@@ -186,7 +188,8 @@ build() {
     [[ "$GEN_COVERAGE" == ON ]] && {
       msg "Generating code coverage report"
       make cov_init &&
-      make lcov
+      make lcov &&
+      make codecov_upload
     }
   fi
 

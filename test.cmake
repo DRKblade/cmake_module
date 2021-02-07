@@ -49,7 +49,7 @@
     add_external_test(${TEST_DIR} ${test})
   endforeach()
   foreach(file ${COPIED_FILES})
-    configure_file(${TEST_DIR}/${file} ${CMAKE_BINARY_DIR}/test/${file} COPYONLY)
+    configure_file(${TEST_DIR}/samples/${file} ${CMAKE_BINARY_DIR}/test/${file} COPYONLY)
   endforeach()
 # }}}
 
@@ -59,12 +59,16 @@ if(GEN_COVERAGE)
   target_link_options(${PROJECT_NAME} PRIVATE -lgcov --coverage)
 
   add_custom_target(cov_init
-    COMMAND mkdir -p coverage/lcov coverage/report
+    COMMAND mkdir -p coverage/lcov coverage/report coverage/codecov
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
   add_custom_target(lcov
-    COMMAND lcov -c -d CMakeFiles/ -o coverage/lcov/main_coverage.info --include "${SRC_DIR}/\\*" &&
-            genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
+    COMMAND lcov -c -d CMakeFiles/ -o coverage/lcov/main_coverage.info --include "${SRC_DIR}/\\*" --include "${PUBLIC_HEADERS_DIR}/\\*" && genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_custom_target(codecov_upload
+    COMMAND curl -s https://codecov.io/bash > codecov.sh
+    COMMAND bash codecov.sh
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage/codecov
   )
 endif()
