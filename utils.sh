@@ -188,8 +188,10 @@ build() {
     [[ "$GEN_COVERAGE" == ON ]] && {
       msg "Generating code coverage report"
       make cov_init &&
-      make lcov &&
-      make codecov_upload
+      make lcov
+      [[ -n "$CODECOV_TOKEN" ]] && {
+        make codecov_upload
+      } || msg '$CODECOV_TOKEN is empty, skipping codecov upload'
     }
   fi
 
