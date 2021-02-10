@@ -5,8 +5,8 @@
 
   set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADERS}")
   install(TARGETS ${PROJECT_NAME}
-          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-          PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+          LIBRARY DESTINATION lib
+          PUBLIC_HEADER DESTINATION include/${PROJECT_NAME})
 # }}}
 
 # Add the build result of the shared library to be used by the executable and external tests {{{
