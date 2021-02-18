@@ -1,26 +1,25 @@
 # Add shared library for core functionalities {{{
   add_library(${PROJECT_NAME} SHARED ${SOURCES})
   list(APPEND targets ${PROJECT_NAME})
-  target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIRS})
-
+  target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+  target_include_directories(${PROJECT_NAME} INTERFACE "${PUBLIC_HEADERS_DIR}")
   set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADERS}")
   install(TARGETS ${PROJECT_NAME}
-          LIBRARY DESTINATION lib
-          PUBLIC_HEADER DESTINATION include/${PROJECT_NAME})
+    LIBRARY DESTINATION lib
+    PUBLIC_HEADER DESTINATION include/${PROJECT_NAME})
 # }}}
 
 # Add the build result of the shared library to be used by the executable and external tests {{{
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/public-headers)
   foreach(header ${PUBLIC_HEADERS})
     get_filename_component(header_name ${header} NAME)
     configure_file(${header} ${CMAKE_BINARY_DIR}/public-headers/${header_name} COPYONLY)
   endforeach()
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/public-headers)
   add_library(${PROJECT_NAME}_physical SHARED IMPORTED)
   target_include_directories(${PROJECT_NAME}_physical INTERFACE ${CMAKE_BINARY_DIR}/public-headers)
   add_dependencies(${PROJECT_NAME}_physical ${PROJECT_NAME})
   set_property(TARGET ${PROJECT_NAME}_physical PROPERTY
-               IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/lib${PROJECT_NAME}.so)
-  # Copy the public header files to a different directory to be included to the physical library
+    IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/lib${PROJECT_NAME}.so)
 # }}}
 
 ## Add executable to provide a command-line interface

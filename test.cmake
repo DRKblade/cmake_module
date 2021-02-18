@@ -7,20 +7,19 @@
     add_test(NAME ${name} COMMAND ${name})
     add_dependencies(${PROJECT_NAME}_tests ${name})
     set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
+    target_link_libraries(${name} ${PROJECT_NAME} gmock_main)
   endfunction()
 
   # Add internal unit tests. Public and private headers are visible to them
   function(add_internal_test root_dir source_file)
     setup_unit_test(${root_dir} ${source_file} name)
-
-    # Link against gmock (this automatically links against gtest)
-    target_link_libraries(${name} ${PROJECT_NAME} gmock_main)
+    target_include_directories(${name} PUBLIC ${INCLUDE_DIRS})
   endfunction()
 
   # Add external unit tests. Only the public headers are visible to them
   function(add_external_test root_dir source_file)
     setup_unit_test(${root_dir} ${source_file} name)
-    target_link_libraries(${name} ${PROJECT_NAME}_physical gmock_main)
+    target_include_directories(${name} PUBLIC ${CMAKE_BINARY_DIR}/public-headers)
   endfunction()
 # }}}
 
@@ -55,8 +54,8 @@
 
 # Generate code coverage report
 if(GEN_COVERAGE)
-  target_compile_options(${PROJECT_NAME} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
-  target_link_options(${PROJECT_NAME} PRIVATE -lgcov --coverage)
+  add_compile_options(${PROJECT_NAME} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
+  add_link_options(${PROJECT_NAME} PRIVATE -lgcov --coverage)
 
   add_custom_target(cov_init
     COMMAND mkdir -p coverage/lcov coverage/report coverage/codecov
