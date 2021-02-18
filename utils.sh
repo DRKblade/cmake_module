@@ -38,12 +38,12 @@ usage() {
           Copy local git repo to archive files
       ${COLORS[GREEN]}--built-line-count${COLORS[OFF]}
           Print line count for header and source code files
+      ${COLORS[GREEN]}-t, --tests${COLORS[OFF]}
+          Build unit tests into './build/test'
       ${COLORS[GREEN]}-T, --coverage${COLORS[OFF]}
           Generate code coverage for the project (implies -t)
       ${COLORS[GREEN]}-I, --noinstall${COLORS[OFF]}
           Execute 'sudo make install' and install $PROJECT
-      ${COLORS[GREEN]}-t, --tests${COLORS[OFF]}
-          Build unit tests into './build/test'
       ${COLORS[GREEN]}-l, --log <log-level>${COLORS[OFF]}
           Build unit tests into './build/test'
       ${COLORS[GREEN]}-P, --purge${COLORS[OFF]}
@@ -189,7 +189,8 @@ build() {
       msg "Generating code coverage report"
       make cov_init &&
       make lcov
-      [[ -n "$CODECOV_TOKEN" ]] && {
+      [[ -f "../.codecov-token" ]] && {
+        export CODECOV_TOKEN=$(gpg -d ../.codecov-token)
         make codecov_upload
       } || msg '$CODECOV_TOKEN is empty, skipping codecov upload'
     }
