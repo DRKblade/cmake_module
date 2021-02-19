@@ -4,22 +4,23 @@
     set(name "test.${testname}")
     set(${output_name} ${name} PARENT_SCOPE)
     add_executable(${name} ${root_dir}/${source_file}.cpp)
-    add_test(NAME ${name} COMMAND ${name})
     add_dependencies(${PROJECT_NAME}_tests ${name})
     set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
     target_link_libraries(${name} ${PROJECT_NAME} gmock_main)
+    target_compile_options(${name} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
+    target_link_options(${name} PRIVATE -lgcov --coverage)
   endfunction()
 
   # Add internal unit tests. Public and private headers are visible to them
   function(add_internal_test root_dir source_file)
     setup_unit_test(${root_dir} ${source_file} name)
-    target_include_directories(${name} PUBLIC ${INCLUDE_DIRS})
+    target_include_directories(${name} PUBLIC "${PUBLIC_HEADERS_DIR}" "${INCLUDE_DIRS}")
   endfunction()
 
   # Add external unit tests. Only the public headers are visible to them
   function(add_external_test root_dir source_file)
     setup_unit_test(${root_dir} ${source_file} name)
-    target_include_directories(${name} PUBLIC ${CMAKE_BINARY_DIR}/public-headers)
+    target_include_directories(${name} PUBLIC "${PUBLIC_HEADERS_DIR}" "${CMAKE_BINARY_DIR}/public-headers")
   endfunction()
 # }}}
 
@@ -54,15 +55,15 @@
 
 # Generate code coverage report
 if(GEN_COVERAGE)
-  add_compile_options(${PROJECT_NAME} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
-  add_link_options(${PROJECT_NAME} PRIVATE -lgcov --coverage)
+  target_compile_options(${PROJECT_NAME} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
+  target_link_options(${PROJECT_NAME} PRIVATE -lgcov --coverage)
 
   add_custom_target(cov_init
     COMMAND mkdir -p coverage/lcov coverage/report coverage/codecov
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
   add_custom_target(lcov
-    COMMAND lcov -c -d CMakeFiles/ -o coverage/lcov/main_coverage.info --include "${SRC_DIR}/\\*" --include "${PUBLIC_HEADERS_DIR}/\\*" && genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
+    COMMAND lcov -c -d CMakeFiles -o coverage/lcov/main_coverage.info --include "${SRC_DIR}/\\*" --include "${PUBLIC_HEADERS_DIR}/\\*" && genhtml coverage/lcov/main_coverage.info --output-directory coverage/report
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
   add_custom_target(codecov_upload

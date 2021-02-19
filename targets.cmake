@@ -2,7 +2,6 @@
   add_library(${PROJECT_NAME} SHARED ${SOURCES})
   list(APPEND targets ${PROJECT_NAME})
   target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
-  target_include_directories(${PROJECT_NAME} INTERFACE "${PUBLIC_HEADERS_DIR}")
   set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADERS}")
   install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION lib
