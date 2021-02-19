@@ -191,8 +191,8 @@ build() {
       make lcov
       [[ -f "../.codecov-token" ]] && {
         export CODECOV_TOKEN=$(gpg -d ../.codecov-token)
-        make codecov_upload
-      } || msg '$CODECOV_TOKEN is empty, skipping codecov upload'
+        [[ -n "$CODECOV_TOKEN" ]] && make codecov_upload
+      } || msg 'Skipping codecov upload'
     }
   fi
 
