@@ -1,25 +1,23 @@
-# Add shared library for core functionalities {{{
-  add_library(${PROJECT_NAME} SHARED ${SOURCES})
-  list(APPEND targets ${PROJECT_NAME})
-  target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
-  set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${PUBLIC_HEADERS}")
-  install(TARGETS ${PROJECT_NAME}
+function(add_shared_lib name sources include_dirs public_headers header_install_path)
+  add_library(${name} SHARED ${sources})
+  list(APPEND targets ${name})
+  target_include_directories(${name} PRIVATE ${include_dirs})
+  set_target_properties(${name} PROPERTIES PUBLIC_HEADER "${public_headers}")
+  install(TARGETS ${name}
     LIBRARY DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/${PROJECT_NAME})
-# }}}
+    PUBLIC_HEADER DESTINATION include/${header_install_path})
 
-# Add the build result of the shared library to be used by the executable and external tests {{{
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/public-headers)
-  foreach(header ${PUBLIC_HEADERS})
+  # Put all header files in one place to be used by external tests
+  set(assembly_path ${CMAKE_BINARY_DIR}/public-headers/${header_install_path})
+  file(MAKE_DIRECTORY ${assembly_path})
+  foreach(header ${public_headers})
     get_filename_component(header_name ${header} NAME)
-    configure_file(${header} ${CMAKE_BINARY_DIR}/public-headers/${header_name} COPYONLY)
+    configure_file(${header} ${assembly_path}/${header_name} COPYONLY)
   endforeach()
-  add_library(${PROJECT_NAME}_physical SHARED IMPORTED)
-  target_include_directories(${PROJECT_NAME}_physical INTERFACE ${CMAKE_BINARY_DIR}/public-headers)
-  add_dependencies(${PROJECT_NAME}_physical ${PROJECT_NAME})
-  set_property(TARGET ${PROJECT_NAME}_physical PROPERTY
-    IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/bin/lib${PROJECT_NAME}.so)
-# }}}
+
+  set_target_properties(${name} PROPERTIES
+      VERSION ${PROJECT_VERSION} LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+endfunction()
 
 ## Add executable to provide a command-line interface
 if(EXECUTABLES)
@@ -32,10 +30,8 @@ if(EXECUTABLES)
   install(TARGETS ${PROJECT_NAME}_exec
           DESTINATION ${CMAKE_INSTALL_BINDIR}
           COMPONENT runtime)
-endif()
 
-set_target_properties(${targets}
-  PROPERTIES VERSION ${PROJECT_VERSION}
-             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-             LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+  set_target_properties(${PROJECT_NAME}_exec PROPERTIES
+      VERSION ${PROJECT_VERSION} RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+endif()
 
