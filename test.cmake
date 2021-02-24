@@ -55,9 +55,6 @@
 
 # Generate code coverage report
 if(GEN_COVERAGE)
-  target_compile_options(${PROJECT_NAME} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
-  target_link_options(${PROJECT_NAME} PRIVATE -lgcov --coverage)
-
   add_custom_target(cov_init
     COMMAND mkdir -p coverage/lcov coverage/report coverage/codecov
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

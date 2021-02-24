@@ -15,6 +15,11 @@ function(add_shared_lib name sources include_dirs public_headers header_install_
     configure_file(${header} ${assembly_path}/${header_name} COPYONLY)
   endforeach()
 
+  if(GEN_COVERAGE)
+    target_compile_options(${name} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
+    target_link_options(${name} PRIVATE -lgcov --coverage)
+  endif()
+
   set_target_properties(${name} PROPERTIES
       VERSION ${PROJECT_VERSION} LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 endfunction()
