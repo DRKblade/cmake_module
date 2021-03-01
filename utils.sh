@@ -20,10 +20,6 @@ archive() {
   echo "Archive generated to $path"
 }
 
-built_line_count() {
-  wc -l $(find {src,include,private-headers} -path "*.*")
-}
-
 usage() { 
   echo " 
   Builds and installs $PROJECT.
@@ -35,17 +31,15 @@ usage() {
       ${COLORS[GREEN]}-A, --auto${COLORS[OFF]}
           Use defaults for every options
       ${COLORS[GREEN]}-a, --archive${COLORS[OFF]}
-          Copy local git repo to archive files
-      ${COLORS[GREEN]}--built-line-count${COLORS[OFF]}
-          Print line count for header and source code files
+          Copy the local git repo to archive files
       ${COLORS[GREEN]}-t, --tests${COLORS[OFF]}
           Build unit tests into './build/test'
       ${COLORS[GREEN]}-T, --coverage${COLORS[OFF]}
           Generate code coverage for the project (implies -t)
       ${COLORS[GREEN]}-I, --noinstall${COLORS[OFF]}
           Execute 'sudo make install' and install $PROJECT
-      ${COLORS[GREEN]}-l, --log <log-level>${COLORS[OFF]}
-          Build unit tests into './build/test'
+      ${COLORS[GREEN]}-d, --debug${COLORS[OFF]}
+          Print debug messages
       ${COLORS[GREEN]}-P, --purge${COLORS[OFF]}
           Delete './build' directory before building
       ${COLORS[GREEN]}-s, --scopes <scopes>${COLORS[OFF]}
@@ -76,18 +70,14 @@ branch_switches() {
       ;;
     -a|--archive)
       archive; ;;
-    --built-line-count)
-      built_line_count;
-      exit 0
-      ;;
     -s|--scopes)
       DEBUG_SCOPES=$2; ;;
     -I|--noinstall)
       INSTALL=OFF; ;;
     -t|--test)
       BUILD_TESTS=ON; ;;
-    -l|--log)
-      LOG_LEVEL=$2; ;;
+    -d|--debug)
+      LG_DBUG=ON; ;;
     -T|--coverage)
       BUILD_TESTS=ON;
       GEN_COVERAGE=ON; ;;
@@ -170,6 +160,7 @@ build() {
         -DDEBUG_SCOPES=${DEBUG_SCOPES} \
         -DGEN_COVERAGE=${GEN_COVERAGE} \
         -DLOG_LEVEL=${LOG_LEVEL} \
+        -DLG_DBUG=${LG_DBUG} \
         -DPLATFORM="Linux" \
         ${USE_PREFIX_OPTION} \
         -${CMAKE_OPTIONS} \
