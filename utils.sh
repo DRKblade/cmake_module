@@ -42,8 +42,6 @@ usage() {
           Print debug messages
       ${COLORS[GREEN]}-P, --purge${COLORS[OFF]}
           Delete './build' directory before building
-      ${COLORS[GREEN]}-s, --scopes <scopes>${COLORS[OFF]}
-          Add scopes for debug logging
       ${COLORS[GREEN]}-p, --use-PREFIX${COLORS[OFF]}
           Set cmake variable CMAKE_INSTALL_PREFIX to \$PREFIX
       ${COLORS[GREEN]}-c, --cmake-option <options>${COLORS[OFF]}
@@ -70,8 +68,6 @@ branch_switches() {
       ;;
     -a|--archive)
       archive; ;;
-    -s|--scopes)
-      DEBUG_SCOPES=$2; ;;
     -I|--noinstall)
       INSTALL=OFF; ;;
     -t|--test)
@@ -157,11 +153,8 @@ build() {
 
   msg "Executing CMake command"
   cmake -DBUILD_TESTS=${BUILD_TESTS} \
-        -DDEBUG_SCOPES=${DEBUG_SCOPES} \
         -DGEN_COVERAGE=${GEN_COVERAGE} \
-        -DLOG_LEVEL=${LOG_LEVEL} \
         -DLG_DBUG=${LG_DBUG} \
-        -DPLATFORM="Linux" \
         ${USE_PREFIX_OPTION} \
         -${CMAKE_OPTIONS} \
         .. || msg_err "Failed to compile project..."
@@ -171,20 +164,7 @@ build() {
 
   # Call tests from inside the test directory so that file dependencies work
   if [[ "$BUILD_TESTS" == ON ]]; then
-    cd test || msg_err "Can't enter test directory"
-    for file in ./test.*; do
-      eval "$file" || msg_err "Unit test failed"
-    done
-    cd ..
-    [[ "$GEN_COVERAGE" == ON ]] && {
-      msg "Generating code coverage report"
-      make cov_init &&
-      make lcov
-      [[ -f "../.codecov-token" ]] && {
-        export CODECOV_TOKEN=$(gpg -d ../.codecov-token)
-        [[ -n "$CODECOV_TOKEN" ]] && make codecov_upload
-      } || msg 'Skipping codecov upload'
-    }
+    ctest -V
   fi
 
   install

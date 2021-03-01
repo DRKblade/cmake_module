@@ -1,3 +1,5 @@
+enable_testing()
+
 # Utility functions to add unit tests {{{
   function(setup_unit_test root_dir source_file output_name)
     string(REPLACE "/" "_" testname ${source_file})
@@ -9,6 +11,7 @@
     target_link_libraries(${name} ${PROJECT_NAME} gmock_main)
     target_compile_options(${name} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
     target_link_options(${name} PRIVATE -lgcov --coverage)
+    add_test(NAME ${name} COMMAND ./${name} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test)
   endfunction()
 
   # Add internal unit tests. Public and private headers are visible to them
