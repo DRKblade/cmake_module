@@ -165,6 +165,15 @@ build() {
   # Call tests from inside the test directory so that file dependencies work
   if [[ "$BUILD_TESTS" == ON ]]; then
     ctest -V
+    [[ "$GEN_COVERAGE" == ON ]] && {
+      msg "Generating code coverage report"
+      make cov_init &&
+      make lcov
+      [[ -f "../.codecov-token" ]] && {
+        export CODECOV_TOKEN=$(gpg -d ../.codecov-token)
+        [[ -n "$CODECOV_TOKEN" ]] && make codecov_upload
+      } || msg 'Skipping codecov upload'
+    }
   fi
 
   install
