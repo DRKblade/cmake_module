@@ -155,6 +155,7 @@ build() {
   cmake -DBUILD_TESTS=${BUILD_TESTS} \
         -DGEN_COVERAGE=${GEN_COVERAGE} \
         -DLG_DBUG=${LG_DBUG} \
+        -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
         ${USE_PREFIX_OPTION} \
         -${CMAKE_OPTIONS} \
         .. || msg_err "Failed to compile project..."
