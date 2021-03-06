@@ -26,7 +26,7 @@ enable_testing()
   # Add external unit tests. Only the public headers are visible to them
   function(add_external_test root_dir source_file)
     setup_unit_test(${root_dir} ${source_file} name)
-    target_include_directories(${name} PUBLIC "${PUBLIC_HEADERS_DIR}" "${CMAKE_BINARY_DIR}/public-headers")
+    target_include_directories(${name} PUBLIC "${PUBLIC_HEADERS_DIR}" "${CMAKE_BINARY_DIR}/include")
   endfunction()
 # }}}
 

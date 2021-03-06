@@ -29,7 +29,7 @@ if(EXECUTABLES)
   add_executable(${PROJECT_NAME}_exec ${EXECUTABLES})
   list(APPEND targets ${PROJECT_NAME}_exec)
   target_link_libraries(${PROJECT_NAME}_exec ${PROJECT_NAME}_physical)
-  target_include_directories(${PROJECT_NAME}_exec PUBLIC ${PUBLIC_HEADERS_DIR})
+  target_include_directories(${PROJECT_NAME}_exec PRIVATE ${PUBLIC_HEADERS_DIR})
 
   set_target_properties(${PROJECT_NAME}_exec PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
   install(TARGETS ${PROJECT_NAME}_exec
