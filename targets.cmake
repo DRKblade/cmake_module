@@ -16,7 +16,7 @@ function(add_shared_lib name sources include_dirs public_headers header_install_
   endforeach()
 
   if(GEN_COVERAGE)
-    target_compile_options(${name} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
+    target_compile_options(${name} PRIVATE -g -fprofile-arcs -ftest-coverage --coverage)
     target_link_options(${name} PRIVATE -lgcov --coverage)
   endif()
 
