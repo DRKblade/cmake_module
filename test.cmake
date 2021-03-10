@@ -9,9 +9,12 @@ enable_testing()
     add_dependencies(${PROJECT_NAME}_tests ${name})
     set_target_properties(${name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
     target_link_libraries(${name} ${PROJECT_NAME} gmock_main)
-    target_compile_options(${name} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
-    target_link_options(${name} PRIVATE -lgcov --coverage)
     add_test(NAME ${name} COMMAND ./${name} WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/test)
+
+    if(GEN_COVERAGE)
+      target_compile_options(${name} PRIVATE -fprofile-arcs -ftest-coverage --coverage)
+      target_link_options(${name} PRIVATE -lgcov --coverage)
+    endif()
   endfunction()
 
   # Add internal unit tests. Public and private headers are visible to them
