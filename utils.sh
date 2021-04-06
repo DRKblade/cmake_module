@@ -157,7 +157,7 @@ build() {
         -DLG_DBUG=${LG_DBUG} \
         -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
         ${USE_PREFIX_OPTION} \
-        -${CMAKE_OPTIONS} \
+        ${CMAKE_OPTIONS} \
         .. || msg_err "Failed to compile project..."
 
   msg "Building project"
