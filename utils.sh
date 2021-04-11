@@ -82,7 +82,7 @@ branch_switches() {
     -p|--use-PREFIX)
       USE_PREFIX=ON; ;;
     -c|--cmake-options)
-      CMAKE_OPTIONS=$2; ;;
+      CMAKE_OPTIONS="-$2"; ;;
     -h|--help)
       usage
       exit 0
