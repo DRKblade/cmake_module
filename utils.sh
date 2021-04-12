@@ -151,14 +151,16 @@ build() {
   [[ -z "$DEBUG_SCOPES" ]] || msg "Using debug scopes: $DEBUG_SCOPES"
   [[ -z "$LOG_LEVEL" ]] && LOG_LEVEL=0
 
-  msg "Executing CMake command"
-  cmake -DBUILD_TESTS=${BUILD_TESTS} \
-        -DGEN_COVERAGE=${GEN_COVERAGE} \
-        -DLG_DBUG=${LG_DBUG} \
-        -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
-        ${USE_PREFIX_OPTION} \
-        ${CMAKE_OPTIONS} \
-        .. || msg_err "Failed to compile project..."
+  cmd="cmake -DBUILD_TESTS=${BUILD_TESTS} \
+-DGEN_COVERAGE=${GEN_COVERAGE} \
+-DLG_DBUG=${LG_DBUG} \
+-DCMAKE_CXX_FLAGS='-Wall -Wextra' \
+${USE_PREFIX_OPTION} \
+${CMAKE_OPTIONS} \
+.. || msg_err 'Failed to compile project...'"
+
+  msg "Executing CMake command: $cmd"
+  eval $cmd
 
   msg "Building project"
   make || msg_err "Failed to build project"
