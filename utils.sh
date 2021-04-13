@@ -1,4 +1,3 @@
-readonly SELF=${0##*/} 
 declare -rA COLORS=( 
   [RED]=$'\033[0;31m' 
   [GREEN]=$'\033[0;32m' 
@@ -146,10 +145,10 @@ build() {
 -DCMAKE_CXX_FLAGS='-Wall -Wextra' \
 ${USE_PREFIX_OPTION} \
 ${CMAKE_OPTIONS} \
-.. || msg_err 'Failed to compile project...'"
+.."
 
   msg "Executing CMake command: $cmd"
-  eval $cmd
+  eval $cmd || msg_err 'Failed to compile project...'
 
   msg "Building project"
   make || msg_err "Failed to build project"
