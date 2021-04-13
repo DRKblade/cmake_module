@@ -13,13 +13,6 @@ declare -rA COLORS=(
 PROJECT=$(grep -oP 'project\(\K[\w]+' CMakeLists.txt)
 VERSION=$(grep -oP 'project\(.*? VERSION \K[0-9.]+' CMakeLists.txt)
 
-archive() {
-  path=./build/$PROJECT-$VERSION
-  git archive --prefix $PROJECT/ --output $path.tar --format tar HEAD &&
-  git archive --prefix $PROJECT/ --output $path.tar.gz --format tar.gz HEAD &&
-  echo "Archive generated to $path"
-}
-
 usage() { 
   echo " 
   Builds and installs $PROJECT.
@@ -30,8 +23,6 @@ usage() {
   ${COLORS[GREEN]}${COLORS[BOLD]}Options:${COLORS[OFF]}
       ${COLORS[GREEN]}-A, --auto${COLORS[OFF]}
           Use defaults for every options
-      ${COLORS[GREEN]}-a, --archive${COLORS[OFF]}
-          Copy the local git repo to archive files
       ${COLORS[GREEN]}-t, --tests${COLORS[OFF]}
           Build unit tests into './build/test'
       ${COLORS[GREEN]}-T, --coverage${COLORS[OFF]}
@@ -66,8 +57,6 @@ branch_switches() {
       [[ -z "$INSTALL" ]] && INSTALL=ON;
       [[ -z "$BUILD_TESTS" ]] && BUILD_TESTS=OFF;
       ;;
-    -a|--archive)
-      archive; ;;
     -I|--noinstall)
       INSTALL=OFF; ;;
     -t|--test)
