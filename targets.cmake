@@ -1,6 +1,5 @@
 function(add_shared_lib name sources include_dirs public_headers header_install_path)
   add_library(${name} SHARED ${sources})
-  list(APPEND targets ${name})
   target_include_directories(${name} PRIVATE ${include_dirs})
   set_target_properties(${name} PROPERTIES PUBLIC_HEADER "${public_headers}")
   install(TARGETS ${name}
@@ -23,20 +22,3 @@ function(add_shared_lib name sources include_dirs public_headers header_install_
   set_target_properties(${name} PROPERTIES
       VERSION ${PROJECT_VERSION} LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 endfunction()
-
-## Add executable to provide a command-line interface
-if(EXECUTABLES)
-  add_executable(${PROJECT_NAME}_exec ${EXECUTABLES})
-  list(APPEND targets ${PROJECT_NAME}_exec)
-  target_link_libraries(${PROJECT_NAME}_exec ${PROJECT_NAME}_physical)
-  target_include_directories(${PROJECT_NAME}_exec PRIVATE ${PUBLIC_HEADERS_DIR})
-
-  set_target_properties(${PROJECT_NAME}_exec PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-  install(TARGETS ${PROJECT_NAME}_exec
-          DESTINATION ${CMAKE_INSTALL_BINDIR}
-          COMPONENT runtime)
-
-  set_target_properties(${PROJECT_NAME}_exec PROPERTIES
-      VERSION ${PROJECT_VERSION} RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-endif()
-
