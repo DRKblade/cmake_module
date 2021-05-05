@@ -30,10 +30,10 @@ usage() {
           Execute 'sudo make install' and install $PROJECT
       ${COLORS[GREEN]}-d, --debug${COLORS[OFF]}
           Print debug messages
-      ${COLORS[GREEN]}-P, --purge${COLORS[OFF]}
-          Delete './build' directory before building
       ${COLORS[GREEN]}-p, --use-PREFIX${COLORS[OFF]}
-          Set cmake variable CMAKE_INSTALL_PREFIX to \$PREFIX
+          Set cmake variable CMAKE_INSTALL_PREFIX to the environment variable \$PREFIX
+      ${COLORS[GREEN]}-P, --prefix path${COLORS[OFF]}
+          Set cmake variable CMAKE_INSTALL_PREFIX to PATH
       ${COLORS[GREEN]}-c, --cmake-option <options>${COLORS[OFF]}
           Add other cmake options
       ${COLORS[GREEN]}-h, --help${COLORS[OFF]}
@@ -65,10 +65,10 @@ branch_switches() {
     -T|--coverage)
       BUILD_TESTS=ON;
       GEN_COVERAGE=ON; ;;
-    -P|--purge)
-      PURGE_BUILD_DIR=ON; ;;
     -p|--use-PREFIX)
-      USE_PREFIX=ON; ;;
+      USE_PREFIX_OPTION="-DCMAKE_INSTALL_PREFIX='$PREFIX'"; ;;
+    -P|--prefix)
+      USE_PREFIX_OPTION="-DCMAKE_INSTALL_PREFIX='$2'"; ;;
     -c|--cmake-options)
       CMAKE_OPTIONS="-$2"; ;;
     -h|--help)
@@ -103,38 +103,9 @@ ask_options() {
   fi
 }
 
-install() {
-  if [[ -z "$INSTALL" ]]; then
-    read -r -p "$(msg "Execute 'sudo make install'? [y/N]: ")" -n 1 p && echo
-    [[ "${p^^}" != "Y" ]] && INSTALL="OFF" || INSTALL="ON"
-  fi
-  if [[ "$INSTALL" == ON ]]; then
-    if ! command -v sudo > /dev/null; then
-      msg "Skipping unsupported command: sudo"
-      make install || msg_err "Failed to install executables"
-    else
-      sudo make install || msg_err "Failed to install executables"
-    fi
-  fi
-}
-
 build() {
-  [[ -d ./build ]] && {
-    if [[ "$PURGE_BUILD_DIR" == ON ]]; then
-      msg "Removing existing build dir"
-      rm -rf ./build >/dev/null || msg_err "Failed to remove existing build dir"
-    else
-      msg "A build dir already exists"
-    fi
-  }
-
   mkdir -p ./build || msg_err "Failed to create build dir"
   cd ./build || msg_err "Failed to enter build dir"
-
-  if [[ "$USE_PREFIX" == ON ]]; then
-    msg 'Setting CMAKE_INSTALL_PREFIX variable to $PREFIX'
-    USE_PREFIX_OPTION="-DCMAKE_INSTALL_PREFIX='$PREFIX'"
-  fi
 
   [[ -z "$DEBUG_SCOPES" ]] || msg "Using debug scopes: $DEBUG_SCOPES"
   [[ -z "$LOG_LEVEL" ]] && LOG_LEVEL=0
@@ -171,5 +142,20 @@ ${CMAKE_OPTIONS} \
 
   msg "Build complete!"
   exit 0
+}
+
+install() {
+  if [[ -z "$INSTALL" ]]; then
+    read -r -p "$(msg "Execute 'sudo make install'? [Y/n]: ")" -n 1 p && echo
+    [[ "${p^^}" != "N" ]] && INSTALL="ON" || INSTALL="OFF"
+  fi
+  if [[ "$INSTALL" == ON ]]; then
+    if ! command -v sudo > /dev/null; then
+      msg "Skipping unsupported command: sudo"
+      make install || msg_err "Failed to install executables"
+    else
+      sudo make install || msg_err "Failed to install executables"
+    fi
+  fi
 }
 
